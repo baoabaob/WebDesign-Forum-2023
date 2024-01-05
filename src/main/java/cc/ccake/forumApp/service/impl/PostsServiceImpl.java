@@ -2,6 +2,7 @@ package cc.ccake.forumApp.service.impl;
 
 import cc.ccake.forumApp.mapper.PostsMapper;
 import cc.ccake.forumApp.model.Post;
+import cc.ccake.forumApp.model.PostPrecisDTO;
 import cc.ccake.forumApp.model.Reply;
 import cc.ccake.forumApp.service.PostsService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostsServiceImpl extends ServiceImpl<PostsMapper, Post> implements PostsService {
@@ -32,6 +34,21 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Post> implements 
     @Override
     public List<Post> getAllPosts() {
         return postsMapper.selectList(null); // 获取所有帖子
+    }
+
+    @Override
+    public List<PostPrecisDTO> getSortedPostPrecis() {
+        QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("created_date");
+        List<Post> posts = list(queryWrapper);
+
+        return posts.stream().map(post -> new PostPrecisDTO(
+                post.getId(),
+                post.getTitle(),
+                post.getUsername(),
+                post.getCreated_date(),
+                post.getContent())
+        ).collect(Collectors.toList());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cc.ccake.forumApp.service;
 
 import cc.ccake.forumApp.model.Post;
+import cc.ccake.forumApp.model.PostPrecisDTO;
 import cc.ccake.forumApp.model.Reply;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,6 +13,8 @@ public interface PostsService extends IService<Post> {
     Post getPostById(Integer id);
 
     List<Post> getAllPosts();
+
+    List<PostPrecisDTO> getSortedPostPrecis();
 
     Post updatePost(Integer id, Post post);
 
