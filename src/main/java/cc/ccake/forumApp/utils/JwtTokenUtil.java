@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class JwtTokenUtil {
     private final String base64Secret = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+QS1HicgKSAjVaBP97V55nH1jOli" +
-            "lZ0bPWREs3mBdGkjx6Axc/Tf/V16Z/h06jbxlIh3j/jRJxU/3RWw4I4FIQ=="; // 你的 Base64 编码密钥
+            "lZ0bPWREs3mBdGkjx6Axc/Tf/V16Z/h06jbxlIh3j/jRJxU/3RWw4I4FIQ=="; // Base64 编码密钥
     private final SecretKey secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Secret));
     private final long validityInMilliseconds = 3600000 * 24; // 1天有效期
     private ConcurrentHashMap<String, Date> tokenBlacklist = new ConcurrentHashMap<>();

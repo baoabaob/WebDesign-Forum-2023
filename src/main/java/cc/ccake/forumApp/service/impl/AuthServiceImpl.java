@@ -21,10 +21,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String login(String username, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-        Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-        if (authenticate == null) {
-            System.console().printf(username + "认证失败");
-            return null;
+        try {
+            Authentication authenticate = authenticationManager.authenticate(authenticationToken);
+            if (authenticate == null) {
+                System.out.println(username + "认证失败");
+                return null;
+            }
+            System.out.println(username + "认证成功");
+        } catch (Exception e) {
+            System.out.println("认证过程中出现异常: " + e.getMessage());
+            e.printStackTrace();
         }
         return jwtTokenUtil.createToken(username);
     }

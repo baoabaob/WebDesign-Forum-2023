@@ -15,5 +15,4 @@ public class UserPostsDTO {
         this.replyIndices = replies;
         this.messages = messages;
     }
-
 }

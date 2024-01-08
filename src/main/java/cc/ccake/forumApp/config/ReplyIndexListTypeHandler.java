@@ -10,6 +10,7 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReplyIndexListTypeHandler implements TypeHandler<List<ReplyIndex>> {
@@ -29,6 +30,9 @@ public class ReplyIndexListTypeHandler implements TypeHandler<List<ReplyIndex>> 
     public List<ReplyIndex> getResult(ResultSet rs, String columnName) throws SQLException {
         try {
             String json = rs.getString(columnName);
+            if (json == null) {
+                return new ArrayList<>(); // 返回一个空列表
+            }
             return mapper.readValue(json, new TypeReference<>() {
             });
         } catch (Exception e) {
@@ -40,6 +44,9 @@ public class ReplyIndexListTypeHandler implements TypeHandler<List<ReplyIndex>> 
     public List<ReplyIndex> getResult(ResultSet rs, int columnIndex) throws SQLException {
         try {
             String json = rs.getString(columnIndex);
+            if (json == null) {
+                return new ArrayList<>(); // 返回一个空列表
+            }
             return mapper.readValue(json, new TypeReference<>() {
             });
         } catch (Exception e) {
@@ -51,6 +58,9 @@ public class ReplyIndexListTypeHandler implements TypeHandler<List<ReplyIndex>> 
     public List<ReplyIndex> getResult(CallableStatement cs, int columnIndex) throws SQLException {
         try {
             String json = cs.getString(columnIndex);
+            if (json == null) {
+                return new ArrayList<>(); // 返回一个空列表
+            }
             return mapper.readValue(json, new TypeReference<>() {
             });
         } catch (Exception e) {
