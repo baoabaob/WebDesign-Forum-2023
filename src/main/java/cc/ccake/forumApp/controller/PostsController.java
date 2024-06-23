@@ -7,6 +7,8 @@ import cc.ccake.forumApp.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
+@Tag(name = "Posts Controller", description = "API for managing posts")
 public class PostsController {
     @Autowired
     PostsService postsService;
@@ -32,9 +35,10 @@ public class PostsController {
 
     @Autowired
     AuthService authService;
+
     private static final Logger logger = LoggerFactory.getLogger(PostsController.class);
 
-    // 获取所有帖子，通过可选参数返回帖子摘要。带分页功能。
+    @Operation(summary = "Get all posts with optional pagination and summary")
     @GetMapping
     public ResponseEntity<?> getPosts(
             @RequestParam(required = false, defaultValue = "false") boolean isPrecis,
@@ -74,6 +78,7 @@ public class PostsController {
         }
     }
 
+    @Operation(summary = "Get the number of posts")
     @GetMapping("/num")
     ResponseEntity<?> getPostNum() {
         logger.info("Processing GET /posts/num request");
@@ -82,7 +87,7 @@ public class PostsController {
         return ResponseEntity.ok(response);
     }
 
-    // 获取当前用户发帖、回复列表和messages
+    @Operation(summary = "Get current user's posts, replies and messages")
     @GetMapping("/my")
     public ResponseEntity<UserPostsDTO> getCurrentUserPosts() {
         logger.info("Processing GET /posts/my request");
@@ -93,25 +98,25 @@ public class PostsController {
         return ResponseEntity.ok(new UserPostsDTO(posts, replies, messages));
     }
 
-    // 给某用户添加一条message
+    @Operation(summary = "Add a message to a user")
     @PostMapping("/messages")
     public ResponseEntity<Void> addMessage(@RequestBody UserMessageDTO msgDTO) {
         logger.info("Processing POST /posts/messages request");
-        List<String> messages = userService.getMessagesByUsername(msgDTO.getMessage());
-        if (messages == null) messages = new ArrayList<String>();
+        List<String> messages = userService.getMessagesByUsername(msgDTO.getUsername());
+        if (messages == null) messages = new ArrayList<>();
         messages.add(msgDTO.getMessage());
         userService.updateMessagesByUsername(msgDTO.getUsername(), messages);
         return ResponseEntity.ok().build();
     }
 
-    // 根据title查询帖子
+    @Operation(summary = "Search posts by title")
     @GetMapping("/search")
     public ResponseEntity<List<Post>> searchPostsByTitle(@RequestParam String title) {
         logger.info("Processing GET /posts/search request");
         return ResponseEntity.ok(postsService.searchPostsByTitle(title));
     }
 
-    // 根据id获取帖子
+    @Operation(summary = "Get post by ID")
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPostById(@RequestParam(required = false, defaultValue = "false") boolean isPrecis, @PathVariable("postId") Integer id) {
         logger.info("Processing GET /posts/" + id + " request");
@@ -129,7 +134,7 @@ public class PostsController {
         return ResponseEntity.ok(post);
     }
 
-    // 用户发帖
+    @Operation(summary = "Create a new post")
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
         logger.info("Processing POST /posts request");
@@ -138,13 +143,13 @@ public class PostsController {
         post.setUsername(username);
         Post createdPost = postsService.createPost(post);
         var userPostIds = userService.getPostsByUsername(username);
-        if (userPostIds == null) userPostIds = new ArrayList<Integer>();
+        if (userPostIds == null) userPostIds = new ArrayList<>();
         userPostIds.add(post.getId());
         userService.updatePostsByUsername(username, userPostIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 
-    // 用户回复某贴
+    @Operation(summary = "Reply to a post")
     @PostMapping("/{postId}/replies")
     public ResponseEntity<Void> replyToPost(@PathVariable Integer postId, @RequestBody Reply reply) {
         logger.info("Processing POST /posts/" + postId + "/replies request");
@@ -159,7 +164,7 @@ public class PostsController {
         return ResponseEntity.ok().build();
     }
 
-    // 用户删除某贴，调用该方法后需要重新获取用户messages
+    @Operation(summary = "Delete a post")
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Integer postId) {
         logger.info("Processing DELETE /posts/" + postId + " request");
@@ -168,7 +173,7 @@ public class PostsController {
         if (post != null && post.getUsername().equals(username)) {
             postsService.deletePost(postId);
             var postIds = userService.getPostsByUsername(username);
-            postIds.remove(postId);//这里可能有bug，不确定是怎么删的
+            postIds.remove(postId);
             userService.updatePostsByUsername(username, postIds);
             return ResponseEntity.ok().build();
         }

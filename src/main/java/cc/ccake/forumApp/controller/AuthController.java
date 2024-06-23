@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,11 +57,17 @@ public class AuthController {
         logger.info("Processing POST /login request");
         String username = user.getUsername();
         String password = user.getPassword();
-        String token = authService.login(username, password);
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "登录成功");
-        response.put("token", token);
-        return ResponseEntity.ok(response);
+        try {
+            String token = authService.login(username, password);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "登录成功");
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
     }
 
     //用户注销

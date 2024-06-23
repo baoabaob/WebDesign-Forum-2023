@@ -34,11 +34,13 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // 允许访问 Swagger UI
                 .requestMatchers(HttpMethod.GET, "/posts/**", "/posts").permitAll()  // 允许对 /posts 的 GET 请求
                 .requestMatchers(HttpMethod.GET, "/posts/my", "/posts/search").authenticated()
                 .requestMatchers(HttpMethod.POST, "/posts/**", "/logout").authenticated()
-                .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()  // 对 /login, /register,
-                .requestMatchers(HttpMethod.DELETE).authenticated()// 对 /posts 的 POST 请求需要认证
+                .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()  // 对 /login, /register 允许访问
+                .requestMatchers(HttpMethod.DELETE).authenticated() // 对 /posts 的 DELETE 请求需要认证
+                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
